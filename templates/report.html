@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>CAKE Click Export Tool</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script type="text/javascript" src="/bower_components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/bower_components/moment/min/moment.min.js"></script>
+    <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+  </head>
+
+  <body>
+    <div class='container'>
+    <h1> CAKE Click Export Tool </h1>
+    <div class="report_container col-md-9">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Date Created</th>
+            <th>Job ID</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+            <th>File Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for job in jobs %}
+          <tr>
+            <td>{{ job.created_date }}</td>
+            <td>{{ job.job_id }}</td>
+            <td>{{ job.start_date }}</td>
+            <td>{{ job.end_date }}</td>
+            <td>{{ job.status }}</td>
+            {% if job.file_link %}
+            <td><a href="{{ job.file_link }}">Download Report</a></td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  </body>
+
+  <style>
+    .container {
+      margin-top: 15px;
+      margin-left: 15px;
+    }
+
+    .report_container {
+      margin-top: 30px;
+
+    }
+
+    h1 {
+      color: blue;
+    }
+  </style>
+
+
+</html>

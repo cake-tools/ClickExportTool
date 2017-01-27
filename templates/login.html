@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html >
+    <head>
+        <meta charset="UTF-8">
+        <title>CAKE Click Export Tool</title>
+        <link rel="stylesheet" href="static/login_page/css/style.css">
+        <!-- start: Favicon and Touch Icons -->
+        <link rel="shortcut icon" href="static/ico/favicon.ico">
+        <!-- end: Favicon and Touch Icons -->
+    </head>
+    <body>
+        <div class="login">
+            <div class="login-screen">
+                <div class="app-title">
+                    <h1> CAKE Click Export Tool</h1>
+                </div>
+                <div class="login-form">
+                    <form action="#" method="POST">
+                        <div class="control-group">
+                            <input type="text" class="login-field admin-domain required-login" value="" placeholder="Admin URL" id="login-name" name="admin">
+                            <label class="login-field-icon fui-user" for="login-name"></label>
+                        </div>
+                        <p id="admin-validation" style="display:none">Enter your CAKE Admin URL and click "Forgot password?" again.</p>
+                        <div class="control-group">
+                            <input type="text" class="login-field required-login" value="" placeholder="example@domain.com" id="login-name" name="username">
+                            <label class="login-field-icon fui-user" for="login-name"></label>
+                        </div>
+                        <div class="control-group">
+                            <input type="password" class="login-field required-login" value="" placeholder="CAKE Password" id="login-pass" name="password">
+                            <label class="login-field-icon fui-lock" for="login-pass"></label>
+                        </div>
+                        <button type="submit" name='login-button' class="btn btn-primary btn-large btn-block">Login</button>
+                        {% with msgs = get_flashed_messages() %}
+                        {% if msgs %}
+                        {%- for msg in msgs %}
+                        <div class="">
+                            <p>{{ msg }}</p>
+                        </div>
+                        {% endfor -%}
+                        {% endif %}
+                        {% endwith %}
+                        <a class="login-link" href="#">Forgot password?</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>

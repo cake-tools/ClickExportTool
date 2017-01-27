@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>CAKE Click Export Tool</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class='container'>
+    <div class='header'>
+      <h1> CAKE Click Export Tool </h1>
+    </div>
+    <div class="api_inputs col-md-3">
+      <form action="/welcome" method="POST" class="form_input well">
+          <label class="begin_date">Start Date</label>
+          <input type="text" class="form-control" id="start_date" name="start_date" placeholder="dd-mm-yyyy"><br>
+
+          <label class="end_date">End Date</label>
+          <input type="text" class="form-control" id="end_date" name="end_date" placeholder="dd-mm-yyyy"><br>
+
+          <input type="submit" class="btn" value="Schedule Report">
+      </form>
+      {{ message }}
+
+    </div>
+
+
+    <div class="report_container col-md-9">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Date Created</th>
+            <th>Job ID</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+            <th>File Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for job in jobs %}
+          <tr>
+            <td>{{ job.created_date }}</td>
+            <td>{{ job.job_id }}</td>
+            <td>{{ job.start_date }}</td>
+            <td>{{ job.end_date }}</td>
+            <td>{{ job.status }}</td>
+            {% if job.file_link %}
+            <td><a href="{{ job.file_link }}">Download Report</a></td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+
+  </div>
+
+  </body>
+
+
+  <style>
+    .container {
+      margin-top: 15px;
+      margin-left: 15px;
+    }
+
+
+
+    .api_inputs {
+      margin-top: 20px;
+    }
+
+    .report_container {
+      margin-top: 15px;
+    }
+
+    h1 {
+      color: blue;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+
+  </style>
+
+</html>

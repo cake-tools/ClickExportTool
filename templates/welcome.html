@@ -37,7 +37,6 @@
             <th>Start Date</th>
             <th>End Date</th>
             <th>Status</th>
-            <th>File Link</th>
           </tr>
         </thead>
         <tbody>
@@ -48,9 +47,6 @@
             <td>{{ job.start_date }}</td>
             <td>{{ job.end_date }}</td>
             <td>{{ job.status }}</td>
-            {% if job.file_link %}
-            <td><a href="{{ job.file_link }}">Download Report</a></td>
-            {% endif %}
           </tr>
           {% endfor %}
         </tbody>

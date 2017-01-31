@@ -69,6 +69,7 @@ def delete_message(receipt_handle):
                                      ReceiptHandle=receipt_handle)
     return response
 
+'''
 def enumerate_dates(start, end):
     start_date = datetime(start.year, start.month, start.day)
     end_date = datetime(end.year, end.month, end.day)
@@ -81,6 +82,7 @@ def enumerate_dates(start, end):
             yield start_date, next_start_hour
             start_date = next_start_hour
         start_date=next_start_date
+'''
 
 def date_convert_for_csv(date):
     extract_integers = re.findall('\d+', date)
@@ -93,7 +95,7 @@ def date_convert_for_csv(date):
         timestamp_parsed = (datetime.utcfromtimestamp(int(date_string))+ timedelta(hours=1)) + '.000000'
         date_result = timestamp_parsed.strftime("%d-%m-%YT%H:%M:%S.%f")
         return date_result
-
+'''
 def conversion_time_delta(conversion_date, click_date):
     conversion_date = datetime.strptime(conversion_date, "%d-%m-%YT%H:%M:%S.%f")
     click_date = datetime.strptime(click_date, "%d-%m-%YT%H:%M:%S.%f")
@@ -109,7 +111,7 @@ def conversion_time_delta(conversion_date, click_date):
             return time_delta
         else:
             return time_delta
-
+'''
 def s3_job(filename):
 # expire 86400 seconds is 24 hours
     s3 = boto3.resource('s3')
@@ -132,7 +134,7 @@ def execute_call(response):
     job_id = load_body['job_id']
     created_date = load_body['created_date']
     receipt_handle = response["Messages"][0]["ReceiptHandle"]
-    delete_message(receipt_handle)
+    #delete_message(receipt_handle)
 
     start_datetime = datetime.strptime(start_date, "%m/%d/%y")
     end_datetime = datetime.strptime(end_date, "%m/%d/%y")
@@ -145,25 +147,25 @@ def execute_call(response):
         for i in xrange(day_delta.days + 1):
 
             for i in xrange(24):
-                with open('temp.csv', 'w') as text_file:
+                with open('temp.csv', 'wb') as text_file:
                     writer = csv.writer(text_file)
-                    record = 'Click ID', 'Visitor ID', 'Tracking ID', 'Request ID', 'UDID', 'Click Date', \
+                    header = 'Click ID', 'Visitor ID', 'Tracking ID', 'Request ID', 'UDID', 'Click Date', \
                             'Affiliate ID', 'Affiliate Name', 'Advertiser ID', 'Advertiser Name', 'Offer ID', \
                             'Offer Name', 'Campaign ID', 'Creative ID', 'Creative Name', 'Sub ID 1', 'Sub ID 2', \
                             'Sub ID 3', 'Sub ID 4', 'Sub ID 5', 'IP Address', 'User Agent', 'Referrer', \
                             'Request URL', 'Redirect URl', 'Country Code', 'Region Code', 'Language', 'ISP', \
                             'Device', 'Operating System', 'OS Major', 'OS Minor', 'Browser', 'Browser Major', \
                             'Browser Minor', 'Disposition', 'Paid Action', 'Currency', 'Amount Paid', \
-                            'Duplicate', 'Duplicate Clicks', 'Total Clicks', 
-                    writer.writerow(record)
+                            'Duplicate', 'Duplicate Clicks', 'Total Clicks',
+                    writer.writerow(header)
 
                     for i in xrange(12):
                         end_time = start_datetime + timedelta(minutes=5)
                         print start_datetime, end_time
 
-                        endpoint_string = 'http://' + admin_domain + '/api/11/reports.asmx/Clicks'
+                        endpoint_string = 'http://' + ADMIN_DOMAIN_URL + '/api/11/reports.asmx/Clicks'
                         payload = dict(
-                            api_key=api_key,
+                            api_key=API_KEY,
                             start_date=str(start_datetime),
                             end_date=str(end_time),
                             affiliate_id=0,
@@ -176,9 +178,10 @@ def execute_call(response):
                             include_tests='False',
                             start_at_row=0,
                             row_limit=0)
+
                         soup = requests.post(endpoint_string,json=payload)
-                        soup_text = soup.text
-                        #test = json.loads(soup_text)
+                        print 'PROCESSING API RESPONSE'
+                        #soup_text = soup.text
                         response = json.loads(soup.text)
 
                         for c in response['d']['clicks']:
@@ -188,54 +191,54 @@ def execute_call(response):
                             request_id = c['request_session_id']
                             udid = ''
                             if not c['udid'] is None:
-                                udid = c['udid']
-                            click_date = c['click_date']
+                                udid = c['udid'].encode('utf-8', 'ignore')
+                            click_date = date_convert_for_csv(c['click_date'])
                             affiliate_id = c['source_affiliate']['source_affiliate_id']
-                            affiliate_name = c['source_affiliate']['source_affiliate_name']
+                            affiliate_name = c['source_affiliate']['source_affiliate_name'].encode('utf-8', 'ignore')
                             advertiser_id = c['brand_advertiser']['brand_advertiser_id']
-                            advertiser_name = c['brand_advertiser']['brand_advertiser_name']
+                            advertiser_name = c['brand_advertiser']['brand_advertiser_name'].encode('utf-8', 'ignore')
                             offer_id = c['site_offer']['site_offer_id']
-                            offer_name = c['site_offer']['site_offer_name']
+                            offer_name = c['site_offer']['site_offer_name'].encode('utf-8', 'ignore')
                             campaign_id = c['campaign']['campaign_id']
                             creative_id = c['creative']['creative_id']
-                            creative_name = c['creative']['creative_name']
-                            sub_id_1 = c['sub_id_1']
-                            sub_id_2 = c['sub_id_2']
-                            sub_id_3 = c['sub_id_3']
-                            sub_id_4 = c['sub_id_4']
-                            sub_id_5 = c['sub_id_5']
+                            creative_name = c['creative']['creative_name'].encode('utf-8', 'ignore')
+                            sub_id_1 = c['sub_id_1'].encode('utf-8', 'ignore')
+                            sub_id_2 = c['sub_id_2'].encode('utf-8', 'ignore')
+                            sub_id_3 = c['sub_id_3'].encode('utf-8', 'ignore')
+                            sub_id_4 = c['sub_id_4'].encode('utf-8', 'ignore')
+                            sub_id_5 = c['sub_id_5'].encode('utf-8', 'ignore')
                             ip_address = c['ip_address']
-                            user_agent = c['user_agent']
-                            referrer_url = c['referrer_url']
-                            request_url = c['request_url']
-                            redirect_url = c['redirect_url']
+                            user_agent = c['user_agent'].encode('utf-8', 'ignore')
+                            referrer_url = c['referrer_url'].encode('utf-8', 'ignore')
+                            request_url = c['request_url'].encode('utf-8', 'ignore')
+                            redirect_url = c['redirect_url'].encode('utf-8', 'ignore')
                             country_code = ''
                             if not c['country'] is None:
-                                country_code = c['country']['country_code']
+                                country_code = c['country']['country_code'].encode('utf-8', 'ignore')
                             region = ''
                             if not c['region'] is None:
-                                region = c['region']['region_code']
+                                region = c['region']['region_name'].encode('utf-8', 'ignore')
                             language = ''
                             if not c['language'] is None:
-                                language = c['language']['language_name']
+                                language = c['language']['language_name'].encode('utf-8', 'ignore')
                             isp = ''
                             if not c['isp'] is None:
-                                isp = c['isp']['isp_name']
+                                isp = c['isp']['isp_name'].encode('utf-8', 'ignore')
                             device = ''
                             if not c['device'] is None:
-                                device = c['device']['device_name']
+                                device = c['device']['device_name'].encode('utf-8', 'ignore')
                             operating_system = ''
                             os_major = ''
                             os_minor = ''
                             if not c['operating_system'] is None:
-                                operating_system = c['operating_system']['operating_system_name']
+                                operating_system = c['operating_system']['operating_system_name'].encode('utf-8', 'ignore')
                                 os_major = c['operating_system']['operating_system_version']['version_name']
                                 os_minor = c['operating_system']['operating_system_version_minor']['version_name']
                             browser = ''
                             browser_major = ''
                             browser_minor = ''
                             if not c['browser'] is None:
-                                browser = c['browser']['browser_name']
+                                browser = c['browser']['browser_name'].encode('utf-8', 'ignore')
                                 browser_major = c['browser']['browser_version']['version_name']
                                 browser_minor = c['browser']['browser_version_minor']['version_name']
                             disposition = c['disposition']
@@ -245,7 +248,7 @@ def execute_call(response):
                             currency = ''
                             amount_paid = ''
                             if not c['paid'] is None:
-                                currency = currencies[c['paid']['currency_id']]
+                                currency = return_currency_name(c['paid']['currency_id'], country_codes)
                                 amount_paid = c['paid']['amount']
                             duplicate = c['duplicate']
                             duplicate_clicks = c['duplicate_clicks']
@@ -263,25 +266,27 @@ def execute_call(response):
 
                             writer.writerow(record)
 
+                        print 'PROCESSING COMPLETE'
                         start_datetime += timedelta(minutes=5)
 
-                    file_link = s3_job('ClickReport_{}{}{}_{}{}_{}{}.csv'.format((start_datetime - timedelta(hours=1)).strftime('%d'), 
-                                                                        (start_datetime - timedelta(hours=1)).strftime('%m'), 
-                                                                        (start_datetime - timedelta(hours=1)).year, 
+                    file_link = s3_job('ClickReport_{}{}{}_{}{}_{}{}'.format((start_datetime - timedelta(hours=1)).strftime('%d'),
+                                                                        (start_datetime - timedelta(hours=1)).strftime('%m'),
+                                                                        (start_datetime - timedelta(hours=1)).year,
                                                                         (start_datetime - timedelta(hours=1)).strftime('%H'),
                                                                         (start_datetime - timedelta(hours=1)).strftime('%M'),
                                                                         start_datetime.strftime('%H'),
                                                                         start_datetime.strftime('%M')))
                     print 'File link:', file_link
+                    print 'REPORT SUCCESSFULLY CREATED'
 
-        print 'REPORT SUCCESSFULLY CREATED'
+        print 'QUEUED REPORT CREATED SUCCESSFULLY'
         print 'CHECKING FOR ADDITIONAL QUEUED EXPORTS'
 
         collection_name = db[MONGODB_DATABASE['collection_name']]
-        collection_name.update_one({"created_date": created_date}, {"$set": {"status": "Success", "file_link": file_link }})
+        collection_name.update_one({"created_date": created_date}, {"$set": {"status": "Success"}})
         in_progress = False
 
-    except Exception:
+    except (KeyboardInterrupt, Exception):
         collection_name = db[MONGODB_DATABASE['collection_name']]
         collection_name.update_one({"created_date": created_date}, {"$set": {"status": "Failed"}})
         in_progress = False

@@ -34,8 +34,7 @@ with app.app_context():
     def index():
 
         if request.method == 'POST':
-            raw_url = request.form['admin']
-            session['admin_domain'] = raw_url.replace('https', '').replace(':', '').replace('/', '').replace('http', '').replace(':', '').replace('/', '')
+            session['admin_domain'] = request.form['admin']
             username = request.form['username']
             password = request.form['password']
 
@@ -81,7 +80,7 @@ with app.app_context():
             sqs_job(queue_message)
 
             collection_name = db[MONGODB_DATABASE['collection_name']]
-            collection_name.insert({"job_id": job_id, "created_date": created_date,  "start_date": start_date, "end_date": end_date, "status": "Queued", "file_link": ""})
+            collection_name.insert({"job_id": job_id, "created_date": created_date,  "start_date": start_date, "end_date": end_date, "status": "Queued"})
 
             message = "Job has been scheduled"
 
@@ -95,7 +94,7 @@ with app.app_context():
         job_list = []
         collection_name = db[MONGODB_DATABASE['collection_name']]
         for i in collection_name.find({}, {'_id':0}).sort('created_date', -1):
-            job_temp = Job(i['job_id'], i['start_date'], i['end_date'], i['created_date'], i['status'], i['file_link'])
+            job_temp = Job(i['job_id'], i['start_date'], i['end_date'], i['created_date'], i['status'])
             job_list.append(job_temp)
         return job_list
 
@@ -129,13 +128,12 @@ with app.app_context():
 
     class Job(object):
 
-        def __init__(self, job_id, start_date, end_date, created_date, status, file_link):
+        def __init__(self, job_id, start_date, end_date, created_date, status):
             self.job_id = job_id
             self.start_date = start_date
             self.end_date = end_date
             self.created_date = created_date
             self.status = status
-            self.file_link = file_link
 
 
     @app.route('/report', methods=['GET'])
@@ -143,7 +141,7 @@ with app.app_context():
         job_list = []
         collection_name = db[MONGODB_DATABASE['collection_name']]
         for i in collection_name.find({}, {'_id':0}).sort('created_date', -1):
-            job_temp = Job(i['job_id'], i['start_date'], i['end_date'], i['created_date'], i['status'], i['file_link'])
+            job_temp = Job(i['job_id'], i['start_date'], i['end_date'], i['created_date'], i['status'])
             job_list.append(job_temp)
 
         return render_template('report.html', jobs=job_list)

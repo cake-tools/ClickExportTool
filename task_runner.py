@@ -134,7 +134,7 @@ def execute_call(response):
     job_id = load_body['job_id']
     created_date = load_body['created_date']
     receipt_handle = response["Messages"][0]["ReceiptHandle"]
-    #delete_message(receipt_handle)
+    delete_message(receipt_handle)
 
     start_datetime = datetime.strptime(start_date, "%m/%d/%y")
     end_datetime = datetime.strptime(end_date, "%m/%d/%y")
@@ -208,10 +208,19 @@ def execute_call(response):
                             sub_id_4 = c['sub_id_4'].encode('utf-8', 'ignore')
                             sub_id_5 = c['sub_id_5'].encode('utf-8', 'ignore')
                             ip_address = c['ip_address']
-                            user_agent = c['user_agent'].encode('utf-8', 'ignore')
-                            referrer_url = c['referrer_url'].encode('utf-8', 'ignore')
-                            request_url = c['request_url'].encode('utf-8', 'ignore')
-                            redirect_url = c['redirect_url'].encode('utf-8', 'ignore')
+
+                            user_agent  = ''
+                            if not c['user_agent'] is None:
+                                user_agent = c['user_agent'].encode('utf-8', 'ignore')
+                            referrer_url = ''
+                            if not c['referrer_url'] is None:
+                                referrer_url = c['referrer_url'].encode('utf-8', 'ignore')
+                            request_url = ''
+                            if not c['request_url'] is None:
+                                request_url = c['request_url'].encode('utf-8', 'ignore')
+                            redirect_url = ''
+                            if not c['redirect_url'] is None:
+                                redirect_url = c['redirect_url'].encode('utf-8', 'ignore')
                             country_code = ''
                             if not c['country'] is None:
                                 country_code = c['country']['country_code'].encode('utf-8', 'ignore')
@@ -277,7 +286,6 @@ def execute_call(response):
                                                                         start_datetime.strftime('%H'),
                                                                         start_datetime.strftime('%M')))
                     print 'File link:', file_link
-                    print 'REPORT SUCCESSFULLY CREATED'
 
         print 'QUEUED REPORT CREATED SUCCESSFULLY'
         print 'CHECKING FOR ADDITIONAL QUEUED EXPORTS'

@@ -69,20 +69,6 @@ def delete_message(receipt_handle):
                                      ReceiptHandle=receipt_handle)
     return response
 
-'''
-def enumerate_dates(start, end):
-    start_date = datetime(start.year, start.month, start.day)
-    end_date = datetime(end.year, end.month, end.day)
-    delta = end_date - start_date
-
-    for i in range(delta.days + 1):
-        next_start_date = start_date + timedelta(days=1)
-        for i in range(288):
-            next_start_hour = start_date + timedelta(minutes=5)
-            yield start_date, next_start_hour
-            start_date = next_start_hour
-        start_date=next_start_date
-'''
 
 def date_convert_for_csv(date):
     extract_integers = re.findall('\d+', date)
@@ -95,23 +81,7 @@ def date_convert_for_csv(date):
         timestamp_parsed = datetime.utcfromtimestamp(int(date_string)) + '.000000'
         date_result = timestamp_parsed.strftime("%d-%m-%YT%H:%M:%S.%f")
         return date_result
-'''
-def conversion_time_delta(conversion_date, click_date):
-    conversion_date = datetime.strptime(conversion_date, "%d-%m-%YT%H:%M:%S.%f")
-    click_date = datetime.strptime(click_date, "%d-%m-%YT%H:%M:%S.%f")
 
-    if click_date > conversion_date:
-        time_delta = "1"
-        return time_delta
-
-    elif conversion_date > click_date:
-        time_delta = conversion_date - click_date
-        if time_delta.seconds < 1:
-            time_delta = "1"
-            return time_delta
-        else:
-            return time_delta
-'''
 def s3_job(filename):
 # expire 86400 seconds is 24 hours
     s3 = boto3.resource('s3')

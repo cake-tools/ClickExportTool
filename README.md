@@ -10,11 +10,14 @@ In order to run the CAKE Click Export Tool, you will need to follow the directio
 * `AWS SQS`
 * `AWS S3`
 
-## Guidelines & Caveats:
+## Guidelines
   * Please use Python 2.7 to run the Click Export Tool!
-  * This tool is not meant for LARGE date ranges or LARGE report sizes. Whenever possible, please keep your report queries within one or two days maximum. Remember, you have the ability to queue multiple jobs!
+  * This tool is not meant for LARGE date ranges or LARGE report sizes. Whenever possible, please keep your report queries in one day intervals maximum. Remember, you have the ability to queue multiple jobs!
   * Please consider that it may take hours to complete one queued job.
   * Use the format 'dd-mm-yyyy' for both the start and end date (the dashes must be included)
+  * **Do not use the Clicks Export Tool concurrently with the Conversion Export Tool. This can cause one or both of the Export Tools to time out and fail.**
+  * Create a new SQS queue and a new S3 bucket for your click reports. Please make sure that the appropriate credentials and names are added to `settings.py`
+
 
 ## Instructions
 
@@ -24,6 +27,7 @@ In order to run the CAKE Click Export Tool, you will need to follow the directio
   * In your terminal run `aws config`. It will ask you a few questions requiring you to provide an AWS access key and secret key as well as your default region.
 
 3. Fill in each empty quote in `settings.py`
+	* If you are using the Conversion Export Tool, make sure that your SQS queue and S3 buckets are different from those used in the Conversion Export Tool.
 
 4. Run the web interface
   * In the main cake click tools directory, run the command 'python run.py', this starts the Flask web server for the web interface.
@@ -40,18 +44,27 @@ Once your credentials are validated, you will land on the welcome page, which wi
 
 Great! You've scheduled an export. Now in a separate terminal window, navigate to the project and run the command 'python task_runner.py'. The script repeats every minute to check if there are new jobs in the queue and subsequently processes those. Keep 'task_runner.py' open for the duration of the export job.
 
-The Task Runner connects to the SQS queue and processes each job in the queue. Keep in mind that it may take a few hours to complete your export. Once the job is complete it drops the completed CSV in your S3 bucket as well as providing a link to download the report in the web interface.
+The Task Runner connects to the SQS queue and processes each job in the queue, sequentially. The Click Export Tool divides one day's export into 24 separate csv's, one for each hour of the day. Please keep in mind that it may take a few hours to complete a one day report.
 
-The csv download link, "Download Report" on the Click Export Tool interface is only valid for 24 hours from the time the queue job completes. This is a limitation of S3. Your csv file will always be accessible from S3.
+The Click Export Tool does not display a 'Download Report' link in the web interface due to the volume of csv's generated. Your csv's are available for download in your respective S3 bucket.
 
 ## Additional Information
 
-### Reading Your Queue Report (Web Interface)
-#### Date Formatting
-The `date format` for the web interface is defaulted to `dd-mm-yyyy`.
+### How the Click Export Tool Works
 
-#### Job ID
-A `job_id` looks like this `report_10012016_04022016`. It consists of 3 parts: title, start, and end date. The title `report` begins the job_id. The `start date` is in `DDMMYYYY` format; same with the `end date`. For the example `job id`, the csv would be contain the results of January 10th 2016 to February 4th 2016.
+The Click Export Tool executes a series api calls, each one exporting 5 minutes worth of Click Report data. At the end of each hour, the csv is uploaded to S3. Each filename in S3 uses the following format, consisting of 4 parts:
+
+`ClickReport_10012016_0000_0100`
+
+1. Report Title: all reports are titled `ClickReport`
+2. Date of Exported Data: If you requested click data from January 10th 2016, the date is written `10012016` or `DDMMYYYY` format.
+3. Start Hour: Beginning hour of report
+4. End Hour: Ending hour of report
+
+
+
+### Reading Your Queue Report (Web Interface)
+
 
 #### Job Statuses
 Your queued export job can have one of the following statuses:

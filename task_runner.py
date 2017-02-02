@@ -89,10 +89,10 @@ def date_convert_for_csv(date):
     date_string = ''.join(extract_integers)
     if len(date_string) > 10:
         date_string = date_string[:10] + '.' + date_string[10:]
-        date_result = (datetime.utcfromtimestamp(float(date_string)) + timedelta(hours=1)).strftime("%d-%m-%YT%H:%M:%S.%f")
+        date_result = datetime.utcfromtimestamp(float(date_string)).strftime("%d-%m-%YT%H:%M:%S.%f")
         return date_result
     else:
-        timestamp_parsed = (datetime.utcfromtimestamp(int(date_string))+ timedelta(hours=1)) + '.000000'
+        timestamp_parsed = datetime.utcfromtimestamp(int(date_string)) + '.000000'
         date_result = timestamp_parsed.strftime("%d-%m-%YT%H:%M:%S.%f")
         return date_result
 '''

@@ -52,7 +52,7 @@ The Click Export Tool does not display a 'Download Report' link in the web inter
 
 ### How the Click Export Tool Works
 
-The Click Export Tool executes a series api calls, each one exporting 5 minutes worth of Click Report data. At the end of each hour, the csv is uploaded to S3. Each filename in S3 uses the following format, consisting of 4 parts:
+The Click Export Tool executes a series api calls, each one exporting 10 minutes worth of Click Report data. At the end of each hour, the csv is uploaded to S3. Each filename in S3 uses the following format, consisting of 4 parts:
 
 `ClickReport_10012016_0000_0100`
 

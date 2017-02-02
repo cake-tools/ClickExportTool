@@ -75,10 +75,10 @@ def date_convert_for_csv(date):
     date_string = ''.join(extract_integers)
     if len(date_string) > 10:
         date_string = date_string[:10] + '.' + date_string[10:]
-        date_result = datetime.utcfromtimestamp(float(date_string)).strftime("%d-%m-%YT%H:%M:%S.%f")
+        date_result = (datetime.utcfromtimestamp(float(date_string)) + timedelta(hours=1)).strftime("%d-%m-%YT%H:%M:%S.%f")
         return date_result
     else:
-        timestamp_parsed = datetime.utcfromtimestamp(int(date_string)) + '.000000'
+        timestamp_parsed = (datetime.utcfromtimestamp(int(date_string))+ timedelta(hours=1)) + '.000000'
         date_result = timestamp_parsed.strftime("%d-%m-%YT%H:%M:%S.%f")
         return date_result
 
@@ -129,8 +129,8 @@ def execute_call(response):
                             'Duplicate', 'Duplicate Clicks', 'Total Clicks',
                     writer.writerow(header)
 
-                    for i in xrange(12):
-                        end_time = start_datetime + timedelta(minutes=5)
+                    for i in xrange(6):
+                        end_time = start_datetime + timedelta(minutes=10)
                         print start_datetime, end_time
 
                         endpoint_string = 'http://' + ADMIN_DOMAIN_URL + '/api/11/reports.asmx/Clicks'
@@ -149,7 +149,7 @@ def execute_call(response):
                             start_at_row=0,
                             row_limit=0)
 
-                        soup = requests.post(endpoint_string,json=payload)
+                        soup = requests.post(endpoint_string,json=payload, stream=True)
                         print 'PROCESSING API RESPONSE'
                         #soup_text = soup.text
                         response = json.loads(soup.text)
@@ -245,8 +245,8 @@ def execute_call(response):
 
                             writer.writerow(record)
 
-                        print 'PROCESSING COMPLETE'
-                        start_datetime += timedelta(minutes=5)
+                        print 'INTERVAL COMPLETE'
+                        start_datetime += timedelta(minutes=10)
 
                     file_link = s3_job('ClickReport_{}{}{}_{}{}_{}{}'.format((start_datetime - timedelta(hours=1)).strftime('%d'),
                                                                         (start_datetime - timedelta(hours=1)).strftime('%m'),

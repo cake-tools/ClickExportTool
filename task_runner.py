@@ -129,8 +129,8 @@ def execute_call(response):
                             'Duplicate', 'Duplicate Clicks', 'Total Clicks',
                     writer.writerow(header)
 
-                    for i in xrange(6):
-                        end_time = start_datetime + timedelta(minutes=10)
+                    for i in xrange(60):
+                        end_time = start_datetime + timedelta(minutes=1)
                         print start_datetime, end_time
 
                         endpoint_string = 'http://' + ADMIN_DOMAIN_URL + '/api/11/reports.asmx/Clicks'
@@ -153,6 +153,7 @@ def execute_call(response):
                         print 'PROCESSING API RESPONSE'
                         #soup_text = soup.text
                         response = json.loads(soup.text)
+			#print response
 
                         for c in response['d']['clicks']:
                             click_id = c['click_id']
@@ -246,7 +247,7 @@ def execute_call(response):
                             writer.writerow(record)
 
                         print 'INTERVAL COMPLETE'
-                        start_datetime += timedelta(minutes=10)
+                        start_datetime += timedelta(minutes=1)
 
                     file_link = s3_job('ClickReport_{}{}{}_{}{}_{}{}'.format((start_datetime - timedelta(hours=1)).strftime('%d'),
                                                                         (start_datetime - timedelta(hours=1)).strftime('%m'),
@@ -264,11 +265,9 @@ def execute_call(response):
         collection_name.update_one({"created_date": created_date}, {"$set": {"status": "Success"}})
         in_progress = False
 
-    except (KeyboardInterrupt, Exception):
-        collection_name = db[MONGODB_DATABASE['collection_name']]
-        collection_name.update_one({"created_date": created_date}, {"$set": {"status": "Failed"}})
+    except (KeyboardInterrupt, Exception, KeyError):
+        print "Key Error occurred"
         in_progress = False
-        raise
 
 start_time = time.time()
 
